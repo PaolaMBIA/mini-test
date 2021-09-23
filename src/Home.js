@@ -106,7 +106,7 @@ function Home({ allMovies, username, setStart }) {
 
         localStorage.setItem('highScores', JSON.stringify(highScores))
 
-        console.log(highScores)
+        console.log(highScores.slice(-1))
     }
 
 
@@ -132,9 +132,9 @@ function Home({ allMovies, username, setStart }) {
                         
                         <button onClick={() => setAllScore(true)} >Regarder les scores</button>
                         <EmailShareButton
-                            url="https://paolambia.fr/"
+                            url=""
                             subject="résutat score"
-                            body={highScores}
+                            body={`Ton score est : ${score}/${allMovies.movies.length}`}
                             className="Demo__some-network__share-button"
                         >
                             <EmailIcon size={32} round />
