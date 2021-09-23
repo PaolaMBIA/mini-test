@@ -5,6 +5,8 @@ import {useState, useEffect} from "react"
 import Home from './Home';
 import {useMovieFetch} from './Hooks/useHome';
 
+
+
 const quest = [
   {
   "questionText": "qui es-tu ?",
@@ -64,6 +66,9 @@ function App() {
   const [showScore, setShowScore] = useState(false);
   const [score, setScore] = useState(0);
   const [state, loading, error] = useMovieFetch();
+
+  const [username, setUsername] = useState("")
+  const [start, setStart] = useState(false)
   
   
   const handleAnswerButtonClick = (isCorrect) => {
@@ -87,49 +92,32 @@ function App() {
 
   };
 
-  const handleAnswerButton = (answer) => {
-    
+
+  const handleInputChange = (e) => {
+    setUsername(e.target.value)
   }
 
-  //https://api.themoviedb.org/3/movie/597891/credits?api_key=932abb19676c822ea035ea1f7b3c7d6b
- 
-
-  if (loading) {
-   <div>load</div>
+  if (state.movies === 0) {
+   return <div>load</div>
   }
   
-  if (error || !Array.isArray(state.movies)) {
-    return <p>There was an error loading your data!</p>;
-  }
- 
-
   return (
     <div className="App">
-      <Home allMovies={state} /> 
       {
-        showScore ?
-          <div>Ton score est de {score } sur {quest.length }</div>
+        start ? <Home allMovies={state} username={username} setStart={setStart} />
           :
           <>
-            <h1>
-              Question {currentQuestion + 1}
-            </h1>
-            <div>
-              {
-                quest[currentQuestion].questionText
-              }
-            </div>
-            <div>
-              {
-                quest[currentQuestion].answerOptions.map((answer, index) => (
-                  <button key={index} onClick={()=>handleAnswerButtonClick(answer.isCorrect)} >{ answer.answerText}</button>
-                ))
-              }
-              <button onClick={() => handleAnswerButton(true)} >vrai</button>
-              <button onClick={()=>handleAnswerButton(false)} >vrai</button>
-            </div>
+            <input
+              name="username"
+              id="username"
+              placeholder="Entrez votre nom"
+              value={username}
+              onChange={(e)=>handleInputChange(e)}
+            />
+            <button onClick={()=>setStart(true)} >Commencer</button>
           </>
       }
+       
     </div>
   );
 }

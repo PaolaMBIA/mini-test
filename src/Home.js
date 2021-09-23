@@ -1,10 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react"
 import { useFetch } from './Hooks/useFetch';
 import { useActorMovie } from './Hooks/useMovieByActor';
+import {
+    EmailIcon,
+    EmailShareButton,
+} from "react-share";
+  
 
+import defaultImage from "./assets/defaultImage.png"
 
-
-function Home({ allMovies }) {
+function Home({ allMovies, username, setStart }) {
     
 
     const RANDOM_MOVIES = Math.floor(Math.random()*allMovies.movies.length)
@@ -15,10 +20,13 @@ function Home({ allMovies }) {
     const [score, setScore] = useState(0);
     const [showScore, setShowScore] = useState(false);
     const [loading, error] = useFetch(allMovies, setActor);
+
+    const [allScore, setAllScore] = useState(false)
+    
     
     const highScores = JSON.parse(localStorage.getItem("highScores")) || []
 
-    console.log(highScores)
+    
   
     
     //const [allActorInMovie] = useActorMovie(allMovies.movies[currentQuestion]);
@@ -76,19 +84,30 @@ function Home({ allMovies }) {
 
         if (isCorrect === true && correctResult === true) {
             setScore(score + 1)
-            console.log("bonne reponse")
             setCorrectResult(false)
         } else if (isCorrect === false && correctResult === false) {
             setScore(score + 1)
-            console.log("bonne reponse")
         } else {
-            console.log("mauvaise reponse")
+
         }
 
    //    setCorrectResult(false)
     
     };
     
+    const handleSaveScore = () => {
+        const resultScore = {
+            score: score,
+            username: username
+        }
+
+        highScores.push(resultScore)
+        highScores.sort((a, b) => b.score - a.score);
+
+        localStorage.setItem('highScores', JSON.stringify(highScores))
+
+        console.log(highScores)
+    }
 
 
     if (allMovies.movies.length === 0 ||actor.length === 0) {
@@ -107,12 +126,39 @@ function Home({ allMovies }) {
                             setShowScore(false)
                             setCurrentQuestion(0)
                             setScore(0)
-                        }} ></button></>
+                        }} >Rejouer</button>
+                        <button onClick={() => handleSaveScore()} >Sauvegarder</button>
+                        <button onClick={() => setStart(false)} >Retour à l'accueil</button>
+                        
+                        <button onClick={() => setAllScore(true)} >Regarder les scores</button>
+                        <EmailShareButton
+                            url="https://paolambia.fr/"
+                            subject="résutat score"
+                            body={highScores}
+                            className="Demo__some-network__share-button"
+                        >
+                            <EmailIcon size={32} round />
+                        </EmailShareButton>
+                        {
+                            allScore && <div>
+                                {
+                                    highScores.map(highScore => (
+                                        <span>{ highScore.username} {highScore.score }</span>
+                                    ))
+                                }
+                            </div>
+                        }
+                    </>
+                    
                     :
                     <>
                         <div>
                         <img src={`http://image.tmdb.org/t/p/w500${allMovies.movies[currentQuestion].poster_path}`} alt ="profil actor"/>
-                            <img src={`http://image.tmdb.org/t/p/w185${item1.map(name=>name.profilActor)}`} alt ="profil actor"/>
+                            <img src={item1.map(profilPath => (
+                                profilPath.profilActor ? `http://image.tmdb.org/t/p/w185${profilPath.profilActor}` : defaultImage
+                            ))
+                                
+                            } alt="profil actor" />
 
                         </div>
                         <div>est-ce que <strong>{item1.map(name=>name.nameActor)}</strong>  a joué dans <strong>{allMovies.movies[currentQuestion].title }</strong> ?</div>
